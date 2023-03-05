@@ -38,6 +38,7 @@ elf = executable(
     'string.c',
     'smbios.c',
     'tables.c',
+    'kernel_zigvisor.c',
   ),
   c_args: c_args,
   include_directories: include_directories('include'),

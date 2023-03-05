@@ -8,6 +8,7 @@
 #include "pci.h"
 #include "benchmark.h"
 #include "smbios.h"
+#include "zigvisor.h"
 
 static void set_realmode_int(int vec, void *p)
 {
@@ -34,7 +35,7 @@ uint32_t lowmem;
 struct e820map *e820;
 static bool have_mmconfig;
 
-static void extract_e820(void)
+__attribute__ ((unused)) static void extract_e820(void)
 {
 	int id = fw_cfg_file_id("etc/e820");
 	uint32_t size;
@@ -95,11 +96,7 @@ int __attribute__ ((section (".text.startup"))) main(void)
 		setup_pci();
 	}
 	setup_idt();
-	fw_cfg_setup();
-	extract_acpi();
-	extract_e820();
 	setup_mptable();
-	extract_smbios();
-	boot_from_fwcfg();
+    boot_zigvisor_kernel();
 	panic();
 }
