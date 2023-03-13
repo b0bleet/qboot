@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <zigvisor.h>
 
 /*
  * When interfacing with assembler code we need to be sure how
@@ -66,7 +67,7 @@ extern uint32_t pic_base(void);
 extern void setup_pci(void);
 extern bool setup_hw(void);
 extern bool setup_mmconfig(void);
-extern void setup_mptable(void);
+extern void setup_mptable(struct zvisor_linuxboot_args *config_area);
 extern void extract_acpi(void);
 extern void boot_from_fwcfg(void);
 

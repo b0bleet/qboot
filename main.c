@@ -35,18 +35,13 @@ uint32_t lowmem;
 struct e820map *e820;
 static bool have_mmconfig;
 
-__attribute__ ((unused)) static void extract_e820(void)
+__attribute__ ((unused)) static void extract_e820(struct e820entry *mem_map)
 {
-	int id = fw_cfg_file_id("etc/e820");
-	uint32_t size;
 	int nr_map;
 	int i;
+    int j;
 
-	if (id == -1)
-		panic();
-
-	size = fw_cfg_file_size(id);
-	nr_map = size / sizeof(e820->map[0]) + 5;
+	nr_map = max_e820_entries + 5;
 
 	e820 = malloc(offsetof(struct e820map, map[nr_map]));
 	e820->nr_map = nr_map;
@@ -66,7 +61,8 @@ __attribute__ ((unused)) static void extract_e820(void)
 	else
 		nr_map--;
 
-	fw_cfg_read_file(id, &e820->map[i], size);
+    for (j = 0; j < max_e820_entries; j++) memcpy(&e820->map[i + j], &mem_map[j], sizeof(struct e820entry));
+
 	for (; i < e820->nr_map; i++)
 		if (e820->map[i].addr == 0) {
 			lowmem = e820->map[i].size;
@@ -91,12 +87,23 @@ int __attribute__ ((section (".text.startup"))) main(void)
 	// and jump there.  From this point we can modify global variables.
 	asm("ljmp $0x8, $1f; 1:");
 
+    printf("███████╗██╗░░░██╗██╗░██████╗░█████╗░██████╗░\n");
+    printf("╚════██║██║░░░██║██║██╔════╝██╔══██╗██╔══██╗\n");
+    printf("░░███╔═╝╚██╗░██╔╝██║╚█████╗░██║░░██║██████╔╝\n");
+    printf("██╔══╝░░░╚████╔╝░██║░╚═══██╗██║░░██║██╔══██╗\n");
+    printf("███████╗░░╚██╔╝░░██║██████╔╝╚█████╔╝██║░░██║\n");
+    printf("╚══════╝░░░╚═╝░░░╚═╝╚═════╝░░╚════╝░╚═╝░░╚═╝\n\n");
+
 	have_mmconfig = setup_mmconfig();
 	if (have_pci) {
 		setup_pci();
 	}
+    struct zvisor_linuxboot_args *config_area;
+    config_area = (struct zvisor_linuxboot_args *)0x30000;
+
+    extract_e820(config_area->mem_map);
 	setup_idt();
-	setup_mptable();
-    boot_zigvisor_kernel();
+	setup_mptable(config_area);
+    boot_zigvisor_kernel(config_area);
 	panic();
 }

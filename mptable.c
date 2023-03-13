@@ -40,7 +40,7 @@ static void mptable_get_cpuid(int *signature, int *features)
 	    : "0" (1));
 }
 
-void setup_mptable(void)
+void setup_mptable(struct zvisor_linuxboot_args *config_area)
 {
 	struct mpf_intel *mpf;
 	struct mpc_table *table;
@@ -59,6 +59,7 @@ void setup_mptable(void)
 	int ssize;
 	int i;
 
+	num_cpus = config_area->cpus_count;
 	ssize = sizeof(struct mpf_intel);
 
 	mpf = (struct mpf_intel *) MPTABLE_START;
@@ -83,8 +84,6 @@ void setup_mptable(void)
 	offset += ssize;
 	ssize = sizeof(struct mpc_cpu);
 
-	fw_cfg_select(FW_CFG_NB_CPUS);
-	num_cpus = fw_cfg_readl_le();
 	mptable_get_cpuid(&cpuid_stepping, &cpuid_features);
 
 	for (i = 0; i < num_cpus; i++) {
@@ -127,8 +126,7 @@ void setup_mptable(void)
 	offset += ssize;
 	ssize = sizeof(struct mpc_intsrc);
 
-	fw_cfg_select(FW_CFG_IRQ0_OVERRIDE);
-	irq0_override = fw_cfg_readl_le();
+	irq0_override = 1;
 
 	for (i = 0; i < 16; i++) {
 		intsrc = (struct mpc_intsrc *) (MPTABLE_START + offset);

@@ -70,7 +70,7 @@ bool parse_bzimage(struct linuxboot_args *args)
 	}
 
 	if (args->initrd_size)
-		initrd_addr = (initrd_max - args->initrd_size) & ~4095;
+		initrd_addr = (uint32_t)args->initrd_addr;
 	else
 		initrd_addr = 0;
 	stl_p(header+0x218, initrd_addr);
