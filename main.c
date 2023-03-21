@@ -87,13 +87,6 @@ int __attribute__ ((section (".text.startup"))) main(void)
 	// and jump there.  From this point we can modify global variables.
 	asm("ljmp $0x8, $1f; 1:");
 
-    printf("███████╗██╗░░░██╗██╗░██████╗░█████╗░██████╗░\n");
-    printf("╚════██║██║░░░██║██║██╔════╝██╔══██╗██╔══██╗\n");
-    printf("░░███╔═╝╚██╗░██╔╝██║╚█████╗░██║░░██║██████╔╝\n");
-    printf("██╔══╝░░░╚████╔╝░██║░╚═══██╗██║░░██║██╔══██╗\n");
-    printf("███████╗░░╚██╔╝░░██║██████╔╝╚█████╔╝██║░░██║\n");
-    printf("╚══════╝░░░╚═╝░░░╚═╝╚═════╝░░╚════╝░╚═╝░░╚═╝\n\n");
-
 	have_mmconfig = setup_mmconfig();
 	if (have_pci) {
 		setup_pci();
@@ -104,6 +97,14 @@ int __attribute__ ((section (".text.startup"))) main(void)
     extract_e820(config_area->mem_map);
 	setup_idt();
 	setup_mptable(config_area);
+
+    printf("███████╗██╗░░░██╗██╗░██████╗░█████╗░██████╗░\n");
+    printf("╚════██║██║░░░██║██║██╔════╝██╔══██╗██╔══██╗\n");
+    printf("░░███╔═╝╚██╗░██╔╝██║╚█████╗░██║░░██║██████╔╝\n");
+    printf("██╔══╝░░░╚████╔╝░██║░╚═══██╗██║░░██║██╔══██╗\n");
+    printf("███████╗░░╚██╔╝░░██║██████╔╝╚█████╔╝██║░░██║\n");
+    printf("╚══════╝░░░╚═╝░░░╚═╝╚═════╝░░╚════╝░╚═╝░░╚═╝\n\n");
+
     boot_zigvisor_kernel(config_area);
 	panic();
 }
